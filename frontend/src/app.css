@@ -1,0 +1,11 @@
+/* Write your global styles here, in PostCSS syntax */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  background: linear-gradient(53deg, rgba(32,10,48,1) 0%, rgb(116 57 135) 76%, rgba(31,7,40,1) 100%);
+  background-repeat: no-repeat;
+  width: 100%;
+  height: 100%;
+}
