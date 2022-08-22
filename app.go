@@ -58,5 +58,5 @@ func (a *App) GetPullRequest(owner, repo string, number int) (*githubservice.Pul
 		return nil, err
 	}
 
-	return &pr, nil
+	return pr, nil
 }

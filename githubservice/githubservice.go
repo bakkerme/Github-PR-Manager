@@ -11,7 +11,7 @@ import (
 type GithubService interface {
 	GetAssignedReviews(username string) ([]Issue, error)
 	GetCompletedReviews(username string) ([]Issue, error)
-	GetPullRequest(owner, repo string, number int) (PullRequest, error)
+	GetPullRequest(owner, repo string, number int) (*PullRequest, error)
 }
 
 type githubService struct {
@@ -36,7 +36,7 @@ func (gh *githubService) GetAssignedReviews(username string) ([]Issue, error) {
 
 	issues := []Issue{}
 	for _, issue := range result.Issues {
-		issues = append(issues, githubIssueToIssue(issue))
+		issues = append(issues, *githubIssueToIssue(issue))
 	}
 
 	return issues, err
@@ -51,14 +51,24 @@ func (gh *githubService) GetCompletedReviews(username string) ([]Issue, error) {
 
 	issues := []Issue{}
 	for _, issue := range result.Issues {
-		issues = append(issues, githubIssueToIssue(issue))
+		issues = append(issues, *githubIssueToIssue(issue))
 	}
 
 	return issues, err
 }
 
-func (gh *githubService) GetPullRequest(owner, repo string, number int) (PullRequest, error) {
+func (gh *githubService) GetPullRequest(owner, repo string, number int) (*PullRequest, error) {
 	result, _, err := gh.client.PullRequests.Get(gh.ctx, owner, repo, number)
+	pr := githubPullRequestToPullRequest(result)
+	return &pr, err
+}
 
-	return githubPullRequestToPullRequest(result), err
+func (gh *githubService) GetPullRequestReviews(owner, repo string, number int) ([]Review, error) {
+	result, _, err := gh.client.PullRequests.GetReviews(gh.ctx, owner, repo, number)
+	reviews := []Review{}
+	for _, review := range result {
+		reviews = append(reviews, *githubReviewToReview(review))
+	}
+
+	return reviews, err
 }

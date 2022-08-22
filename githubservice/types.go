@@ -3,6 +3,7 @@ package githubservice
 import (
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/google/go-github/v45/github"
 )
 
@@ -15,7 +16,7 @@ type Issue struct {
 	Title             string
 	Body              string
 	AuthorAssociation string
-	User              User
+	User              *User
 	Comments          int
 	CreatedAt         time.Time
 	UpdatedAt         time.Time
@@ -27,8 +28,8 @@ type Issue struct {
 	RepositoryURL     string
 }
 
-func githubIssueToIssue(ghi *github.Issue) Issue {
-	return Issue{
+func githubIssueToIssue(ghi *github.Issue) *Issue {
+	return &Issue{
 		ID:                *ghi.ID,
 		Number:            *ghi.Number,
 		State:             *ghi.State,
@@ -70,8 +71,12 @@ type User struct {
 	SubscriptionsURL  string
 }
 
-func githubUserToUser(ghu *github.User) User {
-	return User{
+func githubUserToUser(ghu *github.User) *User {
+	if ghu == nil {
+		return nil
+	}
+
+	return &User{
 		Login:             *ghu.Login,
 		ID:                *ghu.ID,
 		AvatarURL:         *ghu.AvatarURL,
@@ -94,69 +99,81 @@ func githubUserToUser(ghu *github.User) User {
 
 // PullRequest is a struct that represents a pull request
 type PullRequest struct {
-	ID                 int64
-	Number             int
-	State              string
-	Locked             bool
-	Title              string
-	Body               string
-	CreatedAt          time.Time
-	UpdatedAt          time.Time
-	ClosedAt           time.Time
-	MergedAt           time.Time
-	User               User
-	Draft              bool
-	Merged             bool
-	Mergeable          bool
-	MergeableState     string
-	MergedBy           User
-	Comments           int
-	Additions          int
-	Deletions          int
-	ChangedFiles       int
-	HTMLURL            string
-	Assignee           User
+	ID                 *int64
+	Number             *int
+	State              *string
+	Locked             *bool
+	Title              *string
+	Body               *string
+	CreatedAt          *time.Time
+	UpdatedAt          *time.Time
+	ClosedAt           *time.Time
+	MergedAt           *time.Time
+	User               *User
+	Draft              *bool
+	Merged             *bool
+	Mergeable          *bool
+	MergeableState     *string
+	MergedBy           *User
+	Comments           *int
+	Additions          *int
+	Deletions          *int
+	ChangedFiles       *int
+	HTMLURL            *string
+	Assignee           *User
 	Assignees          []*User
 	RequestedReviewers []*User
 }
 
 func githubPullRequestToPullRequest(ghp *github.PullRequest) PullRequest {
+	spew.Dump(ghp)
 	assignees := make([]*User, 0)
 	for _, assignee := range ghp.Assignees {
 		user := githubUserToUser(assignee)
-		assignees = append(assignees, &user)
+		assignees = append(assignees, user)
 	}
 
 	requestedReviewers := make([]*User, 0)
 	for _, reviewer := range ghp.RequestedReviewers {
 		user := githubUserToUser(reviewer)
-		requestedReviewers = append(requestedReviewers, &user)
+		requestedReviewers = append(requestedReviewers, user)
 	}
 
 	return PullRequest{
-		ID:                 *ghp.ID,
-		Number:             *ghp.Number,
-		State:              *ghp.State,
-		Locked:             *ghp.Locked,
-		Title:              *ghp.Title,
-		Body:               *ghp.Body,
-		CreatedAt:          *ghp.CreatedAt,
-		UpdatedAt:          *ghp.UpdatedAt,
-		ClosedAt:           *ghp.ClosedAt,
-		MergedAt:           *ghp.MergedAt,
+		ID:                 ghp.ID,
+		Number:             ghp.Number,
+		State:              ghp.State,
+		Locked:             ghp.Locked,
+		Title:              ghp.Title,
+		Body:               ghp.Body,
+		CreatedAt:          ghp.CreatedAt,
+		UpdatedAt:          ghp.UpdatedAt,
+		ClosedAt:           ghp.ClosedAt,
+		MergedAt:           ghp.MergedAt,
 		User:               githubUserToUser(ghp.User),
-		Draft:              *ghp.Draft,
-		Merged:             *ghp.Merged,
-		Mergeable:          *ghp.Mergeable,
-		MergeableState:     *ghp.MergeableState,
+		Draft:              ghp.Draft,
+		Merged:             ghp.Merged,
+		Mergeable:          ghp.Mergeable,
+		MergeableState:     ghp.MergeableState,
 		MergedBy:           githubUserToUser(ghp.MergedBy),
-		Comments:           *ghp.Comments,
-		Additions:          *ghp.Additions,
-		Deletions:          *ghp.Deletions,
-		ChangedFiles:       *ghp.ChangedFiles,
-		HTMLURL:            *ghp.HTMLURL,
+		Comments:           ghp.Comments,
+		Additions:          ghp.Additions,
+		Deletions:          ghp.Deletions,
+		ChangedFiles:       ghp.ChangedFiles,
+		HTMLURL:            ghp.HTMLURL,
 		Assignee:           githubUserToUser(ghp.Assignee),
-		Assignees:          requestedReviewers,
+		Assignees:          assignees,
 		RequestedReviewers: requestedReviewers,
 	}
+}
+
+type PullRequestReview struct {
+	ID             *int64
+	User           *User
+	Body           string
+	SubmittedAt    *time.Time
+	CommitID       *string
+	HTMLURL        *string
+	PullRequestURL *string
+	State          *string
 }
