@@ -1,8 +1,8 @@
 export function repoURLToName(repoURL) {
   const splits = repoURL.split('/');
   return  {
-    user: splits[splits.length - 2], 
-    repo: splits[splits.length - 1],
+    user: splits[splits.length - 4], 
+    repo: splits[splits.length - 3],
   }
 }
 

@@ -1,74 +1,74 @@
+// Package githubservice provides github connections
 package githubservice
 
 import (
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/google/go-github/v45/github"
 )
 
 // Issue is a struct that represents a pull request
 type Issue struct {
-	ID                int64
-	Number            int
-	State             string
-	Locked            bool
-	Title             string
-	Body              string
-	AuthorAssociation string
+	ID                *int64
+	Number            *int
+	State             *string
+	Locked            *bool
+	Title             *string
+	Body              *string
+	AuthorAssociation *string
 	User              *User
-	Comments          int
-	CreatedAt         time.Time
-	UpdatedAt         time.Time
-	URL               string
-	HTMLURL           string
-	CommentsURL       string
-	EventsURL         string
-	LabelsURL         string
-	RepositoryURL     string
+	Comments          *int
+	CreatedAt         *time.Time
+	UpdatedAt         *time.Time
+	URL               *string
+	HTMLURL           *string
+	CommentsURL       *string
+	EventsURL         *string
+	LabelsURL         *string
+	RepositoryURL     *string
 }
 
 func githubIssueToIssue(ghi *github.Issue) *Issue {
 	return &Issue{
-		ID:                *ghi.ID,
-		Number:            *ghi.Number,
-		State:             *ghi.State,
-		Locked:            *ghi.Locked,
-		Title:             *ghi.Title,
-		Body:              *ghi.Body,
-		AuthorAssociation: *ghi.AuthorAssociation,
+		ID:                ghi.ID,
+		Number:            ghi.Number,
+		State:             ghi.State,
+		Locked:            ghi.Locked,
+		Title:             ghi.Title,
+		Body:              ghi.Body,
+		AuthorAssociation: ghi.AuthorAssociation,
 		User:              githubUserToUser(ghi.User),
-		Comments:          *ghi.Comments,
-		CreatedAt:         *ghi.CreatedAt,
-		UpdatedAt:         *ghi.UpdatedAt,
-		URL:               *ghi.URL,
-		HTMLURL:           *ghi.HTMLURL,
-		CommentsURL:       *ghi.CommentsURL,
-		EventsURL:         *ghi.EventsURL,
-		LabelsURL:         *ghi.LabelsURL,
-		RepositoryURL:     *ghi.RepositoryURL,
+		Comments:          ghi.Comments,
+		CreatedAt:         ghi.CreatedAt,
+		UpdatedAt:         ghi.UpdatedAt,
+		URL:               ghi.URL,
+		HTMLURL:           ghi.HTMLURL,
+		CommentsURL:       ghi.CommentsURL,
+		EventsURL:         ghi.EventsURL,
+		LabelsURL:         ghi.LabelsURL,
+		RepositoryURL:     ghi.RepositoryURL,
 	}
 }
 
 // User is a struct that represents a user
 type User struct {
-	Login             string
-	ID                int64
-	AvatarURL         string
-	HTMLURL           string
-	GravatarID        string
-	Type              string
-	SiteAdmin         bool
-	URL               string
-	EventsURL         string
-	FollowingURL      string
-	FollowersURL      string
-	GistsURL          string
-	OrganizationsURL  string
-	ReceivedEventsURL string
-	ReposURL          string
-	StarredURL        string
-	SubscriptionsURL  string
+	Login             *string
+	ID                *int64
+	AvatarURL         *string
+	HTMLURL           *string
+	GravatarID        *string
+	Type              *string
+	SiteAdmin         *bool
+	URL               *string
+	EventsURL         *string
+	FollowingURL      *string
+	FollowersURL      *string
+	GistsURL          *string
+	OrganizationsURL  *string
+	ReceivedEventsURL *string
+	ReposURL          *string
+	StarredURL        *string
+	SubscriptionsURL  *string
 }
 
 func githubUserToUser(ghu *github.User) *User {
@@ -77,23 +77,23 @@ func githubUserToUser(ghu *github.User) *User {
 	}
 
 	return &User{
-		Login:             *ghu.Login,
-		ID:                *ghu.ID,
-		AvatarURL:         *ghu.AvatarURL,
-		HTMLURL:           *ghu.HTMLURL,
-		GravatarID:        *ghu.GravatarID,
-		Type:              *ghu.Type,
-		SiteAdmin:         *ghu.SiteAdmin,
-		URL:               *ghu.URL,
-		EventsURL:         *ghu.EventsURL,
-		FollowingURL:      *ghu.FollowingURL,
-		FollowersURL:      *ghu.FollowersURL,
-		GistsURL:          *ghu.GistsURL,
-		OrganizationsURL:  *ghu.OrganizationsURL,
-		ReceivedEventsURL: *ghu.ReceivedEventsURL,
-		ReposURL:          *ghu.ReposURL,
-		StarredURL:        *ghu.StarredURL,
-		SubscriptionsURL:  *ghu.SubscriptionsURL,
+		Login:             ghu.Login,
+		ID:                ghu.ID,
+		AvatarURL:         ghu.AvatarURL,
+		HTMLURL:           ghu.HTMLURL,
+		GravatarID:        ghu.GravatarID,
+		Type:              ghu.Type,
+		SiteAdmin:         ghu.SiteAdmin,
+		URL:               ghu.URL,
+		EventsURL:         ghu.EventsURL,
+		FollowingURL:      ghu.FollowingURL,
+		FollowersURL:      ghu.FollowersURL,
+		GistsURL:          ghu.GistsURL,
+		OrganizationsURL:  ghu.OrganizationsURL,
+		ReceivedEventsURL: ghu.ReceivedEventsURL,
+		ReposURL:          ghu.ReposURL,
+		StarredURL:        ghu.StarredURL,
+		SubscriptionsURL:  ghu.SubscriptionsURL,
 	}
 }
 
@@ -126,7 +126,6 @@ type PullRequest struct {
 }
 
 func githubPullRequestToPullRequest(ghp *github.PullRequest) PullRequest {
-	spew.Dump(ghp)
 	assignees := make([]*User, 0)
 	for _, assignee := range ghp.Assignees {
 		user := githubUserToUser(assignee)
@@ -167,13 +166,27 @@ func githubPullRequestToPullRequest(ghp *github.PullRequest) PullRequest {
 	}
 }
 
+// PullRequestReview is a struct that represents the review of a pull request
 type PullRequestReview struct {
 	ID             *int64
 	User           *User
-	Body           string
+	Body           *string
 	SubmittedAt    *time.Time
 	CommitID       *string
 	HTMLURL        *string
 	PullRequestURL *string
 	State          *string
+}
+
+func githubPullRequestReviewToPullRequestReview(ghp *github.PullRequestReview) *PullRequestReview {
+	return &PullRequestReview{
+		ID:             ghp.ID,
+		User:           githubUserToUser(ghp.User),
+		Body:           ghp.Body,
+		SubmittedAt:    ghp.SubmittedAt,
+		CommitID:       ghp.CommitID,
+		HTMLURL:        ghp.HTMLURL,
+		PullRequestURL: ghp.PullRequestURL,
+		State:          ghp.State,
+	}
 }

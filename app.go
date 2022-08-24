@@ -1,7 +1,10 @@
+// Package main is the main package for the app
 package main
 
 import (
 	"context"
+	"fmt"
+	"strings"
 
 	"github.com/bakkerme/github-pr-manager/githubservice"
 )
@@ -29,6 +32,31 @@ func NewApp(gh githubservice.GithubService, cfg config) *App {
 // so we can call the runtime methods
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
+}
+
+// GetPullRequestsToReviewForUser returns the pull requests to review for the given user
+func (a *App) GetPullRequestsToReviewForUser() ([]githubservice.PullRequest, error) {
+	issues, err := a.GetAssignedReviews()
+	if err != nil {
+		return nil, err
+	}
+
+	pullRequests := make([]githubservice.PullRequest, len(issues))
+	for i, issue := range issues {
+		userRepo, err := getUserAndRepoFromRepoURL(*issue.RepositoryURL)
+		if err != nil {
+			return nil, err
+		}
+
+		pr, err := a.GetPullRequest(userRepo.user, userRepo.repo, *issue.Number)
+		if err != nil {
+			return nil, err
+		}
+
+		pullRequests[i] = *pr
+	}
+
+	return pullRequests, nil
 }
 
 // GetAssignedReviews returns the assigned reviews for user
@@ -59,4 +87,22 @@ func (a *App) GetPullRequest(owner, repo string, number int) (*githubservice.Pul
 	}
 
 	return pr, nil
+}
+
+type userAndRepo struct {
+	user string
+	repo string
+}
+
+func getUserAndRepoFromRepoURL(url string) (*userAndRepo, error) {
+	withoutDomain := strings.Replace(url, "https://api.github.com/repos/", "", 1)
+	urlParts := strings.Split(withoutDomain, "/")
+	if len(urlParts) != 2 {
+		return nil, fmt.Errorf("invalid repo url: %s", url)
+	}
+
+	return &userAndRepo{
+		user: urlParts[0],
+		repo: urlParts[1],
+	}, nil
 }

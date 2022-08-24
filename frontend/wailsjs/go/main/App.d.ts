@@ -7,3 +7,5 @@ export function GetAssignedReviews():Promise<Array<githubservice.Issue>>;
 export function GetCompletedReviews():Promise<Array<githubservice.Issue>>;
 
 export function GetPullRequest(arg1:string,arg2:string,arg3:number):Promise<githubservice.PullRequest>;
+
+export function GetPullRequestsToReviewForUser():Promise<Array<githubservice.PullRequest>>;

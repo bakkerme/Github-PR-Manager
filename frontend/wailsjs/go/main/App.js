@@ -13,3 +13,7 @@ export function GetCompletedReviews() {
 export function GetPullRequest(arg1, arg2, arg3) {
   return window['go']['main']['App']['GetPullRequest'](arg1, arg2, arg3);
 }
+
+export function GetPullRequestsToReviewForUser() {
+  return window['go']['main']['App']['GetPullRequestsToReviewForUser']();
+}

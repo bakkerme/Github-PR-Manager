@@ -4,7 +4,6 @@ go 1.17
 
 require (
 	github.com/bakkerme/hyperfocus-utils v1.1.0
-	github.com/davecgh/go-spew v1.1.1
 	github.com/google/go-github/v45 v45.2.0
 	github.com/wailsapp/wails/v2 v2.0.0-beta.44.2
 	golang.org/x/oauth2 v0.0.0-20220722155238-128564f6959c

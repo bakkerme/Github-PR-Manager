@@ -6,4 +6,7 @@ html {
   height: 100%;
 
   color: #dcf3ffff;
+
+  font-family: "Noto Mono";
+  font-weight: 500;
 }

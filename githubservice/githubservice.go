@@ -1,3 +1,4 @@
+// Package githubservice provides github connections
 package githubservice
 
 import (
@@ -63,11 +64,18 @@ func (gh *githubService) GetPullRequest(owner, repo string, number int) (*PullRe
 	return &pr, err
 }
 
-func (gh *githubService) GetPullRequestReviews(owner, repo string, number int) ([]Review, error) {
-	result, _, err := gh.client.PullRequests.GetReviews(gh.ctx, owner, repo, number)
-	reviews := []Review{}
+func (gh *githubService) GetPullRequestReviews(owner, repo string, number int) ([]PullRequestReview, error) {
+	result, _, err := gh.client.PullRequests.ListReviews(
+		gh.ctx,
+		owner,
+		repo,
+		number,
+		&github.ListOptions{Page: 0, PerPage: 100},
+	)
+
+	reviews := []PullRequestReview{}
 	for _, review := range result {
-		reviews = append(reviews, *githubReviewToReview(review))
+		reviews = append(reviews, *githubPullRequestReviewToPullRequestReview(review))
 	}
 
 	return reviews, err
