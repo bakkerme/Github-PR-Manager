@@ -53,7 +53,18 @@ func (a *App) GetPullRequestsToReviewForUser() ([]githubservice.PullRequest, err
 			return nil, err
 		}
 
+		reviews, err := a.gh.GetPullRequestReviews(userRepo.user, userRepo.repo, *issue.Number)
+		if err != nil {
+			return nil, err
+		}
+
+		pr.Reviews = reviews
+
+		reviewState := getReviewStateForUsers(reviews)
+		pr.ReviewStateForUser = reviewState
+
 		pullRequests[i] = *pr
+
 	}
 
 	return pullRequests, nil
@@ -105,4 +116,26 @@ func getUserAndRepoFromRepoURL(url string) (*userAndRepo, error) {
 		user: urlParts[0],
 		repo: urlParts[1],
 	}, nil
+}
+
+func getReviewStateForUsers(reviews []githubservice.PullRequestReview) []githubservice.UserReviewState {
+	userToReview := map[string]githubservice.UserReviewState{}
+
+	for _, review := range reviews {
+		if reviewEntry, ok := userToReview[review.User.Login]; ok {
+			reviewEntry.ReviewState = review.State
+		} else {
+			userToReview[review.User.Login] = githubservice.UserReviewState{
+				User:        review.User,
+				ReviewState: review.State,
+			}
+		}
+	}
+
+	reviewsForUser := []githubservice.UserReviewState{}
+	for _, review := range userToReview {
+		reviewsForUser = append(reviewsForUser, review)
+	}
+
+	return reviewsForUser
 }

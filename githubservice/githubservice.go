@@ -13,6 +13,7 @@ type GithubService interface {
 	GetAssignedReviews(username string) ([]Issue, error)
 	GetCompletedReviews(username string) ([]Issue, error)
 	GetPullRequest(owner, repo string, number int) (*PullRequest, error)
+	GetPullRequestReviews(owner, repo string, number int) ([]PullRequestReview, error)
 }
 
 type githubService struct {

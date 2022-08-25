@@ -1,12 +1,25 @@
 /* Write your global styles here, in PostCSS syntax */
+:root {
+  --bg-dark: #22313aff;
+  --bg-light: #2b3c46ff;
+  
+  --fg-primary: #dcf3ffff;
+  --fg-dark: #7996a9ff;
+
+  --approved: #2dc300ff;
+  --pending: #e3e3e3ff;
+  --changes-requested: #d02900ff;
+}
+
 html {
-  background: #22313aff;
-  background-repeat: no-repeat;
+  background: var(--bg-dark);
   width: 100%;
   height: 100%;
 
-  color: #dcf3ffff;
+  color: var(--fg-primary);
 
   font-family: "Noto Mono";
   font-weight: 500;
 }
+
+

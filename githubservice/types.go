@@ -52,23 +52,23 @@ func githubIssueToIssue(ghi *github.Issue) *Issue {
 
 // User is a struct that represents a user
 type User struct {
-	Login             *string
-	ID                *int64
-	AvatarURL         *string
-	HTMLURL           *string
-	GravatarID        *string
-	Type              *string
-	SiteAdmin         *bool
-	URL               *string
-	EventsURL         *string
-	FollowingURL      *string
-	FollowersURL      *string
-	GistsURL          *string
-	OrganizationsURL  *string
-	ReceivedEventsURL *string
-	ReposURL          *string
-	StarredURL        *string
-	SubscriptionsURL  *string
+	Login             string
+	ID                int64
+	AvatarURL         string
+	HTMLURL           string
+	GravatarID        string
+	Type              string
+	SiteAdmin         bool
+	URL               string
+	EventsURL         string
+	FollowingURL      string
+	FollowersURL      string
+	GistsURL          string
+	OrganizationsURL  string
+	ReceivedEventsURL string
+	ReposURL          string
+	StarredURL        string
+	SubscriptionsURL  string
 }
 
 func githubUserToUser(ghu *github.User) *User {
@@ -77,23 +77,23 @@ func githubUserToUser(ghu *github.User) *User {
 	}
 
 	return &User{
-		Login:             ghu.Login,
-		ID:                ghu.ID,
-		AvatarURL:         ghu.AvatarURL,
-		HTMLURL:           ghu.HTMLURL,
-		GravatarID:        ghu.GravatarID,
-		Type:              ghu.Type,
-		SiteAdmin:         ghu.SiteAdmin,
-		URL:               ghu.URL,
-		EventsURL:         ghu.EventsURL,
-		FollowingURL:      ghu.FollowingURL,
-		FollowersURL:      ghu.FollowersURL,
-		GistsURL:          ghu.GistsURL,
-		OrganizationsURL:  ghu.OrganizationsURL,
-		ReceivedEventsURL: ghu.ReceivedEventsURL,
-		ReposURL:          ghu.ReposURL,
-		StarredURL:        ghu.StarredURL,
-		SubscriptionsURL:  ghu.SubscriptionsURL,
+		Login:             *ghu.Login,
+		ID:                *ghu.ID,
+		AvatarURL:         *ghu.AvatarURL,
+		HTMLURL:           *ghu.HTMLURL,
+		GravatarID:        *ghu.GravatarID,
+		Type:              *ghu.Type,
+		SiteAdmin:         *ghu.SiteAdmin,
+		URL:               *ghu.URL,
+		EventsURL:         *ghu.EventsURL,
+		FollowingURL:      *ghu.FollowingURL,
+		FollowersURL:      *ghu.FollowersURL,
+		GistsURL:          *ghu.GistsURL,
+		OrganizationsURL:  *ghu.OrganizationsURL,
+		ReceivedEventsURL: *ghu.ReceivedEventsURL,
+		ReposURL:          *ghu.ReposURL,
+		StarredURL:        *ghu.StarredURL,
+		SubscriptionsURL:  *ghu.SubscriptionsURL,
 	}
 }
 
@@ -123,6 +123,10 @@ type PullRequest struct {
 	Assignee           *User
 	Assignees          []*User
 	RequestedReviewers []*User
+
+	// Below are computed and not taken directly from a github.PullRequest object
+	Reviews            []PullRequestReview
+	ReviewStateForUser []UserReviewState
 }
 
 func githubPullRequestToPullRequest(ghp *github.PullRequest) PullRequest {
@@ -168,25 +172,68 @@ func githubPullRequestToPullRequest(ghp *github.PullRequest) PullRequest {
 
 // PullRequestReview is a struct that represents the review of a pull request
 type PullRequestReview struct {
-	ID             *int64
+	ID             int64
 	User           *User
-	Body           *string
+	Body           string
 	SubmittedAt    *time.Time
-	CommitID       *string
-	HTMLURL        *string
-	PullRequestURL *string
-	State          *string
+	CommitID       string
+	HTMLURL        string
+	PullRequestURL string
+	State          ReviewState
+}
+
+// UserReviewState returns the review status for a user on a pull request.
+// This is useful for getting a quick indication of what each reviewers most recent
+// review is
+type UserReviewState struct {
+	User        *User
+	ReviewState ReviewState
+}
+
+// ReviewState is the state of a pull request review
+type ReviewState string
+
+// ReviewState values
+const (
+	Approved         = "APPROVED"
+	ChangesRequested = "CHANGES_REQUESTED"
+	Commented        = "COMMENTED"
+	Dismissed        = "DISMISSED"
+	Pending          = "PENDING"
+)
+
+func reviewStateStringToReviewState(reviewState string) ReviewState {
+	switch reviewState {
+	case "APPROVED":
+		return Approved
+	case "CHANGES_REQUESTED":
+		return ChangesRequested
+	case "COMMENTED":
+		return Commented
+	case "DISMISSED":
+		return Dismissed
+	case "PENDING":
+		return Pending
+	}
+	return ""
 }
 
 func githubPullRequestReviewToPullRequestReview(ghp *github.PullRequestReview) *PullRequestReview {
+	var state ReviewState
+	if ghp.State == nil {
+		state = Pending
+	} else {
+		state = reviewStateStringToReviewState(*ghp.State)
+	}
+
 	return &PullRequestReview{
-		ID:             ghp.ID,
+		ID:             *ghp.ID,
 		User:           githubUserToUser(ghp.User),
-		Body:           ghp.Body,
+		Body:           *ghp.Body,
 		SubmittedAt:    ghp.SubmittedAt,
-		CommitID:       ghp.CommitID,
-		HTMLURL:        ghp.HTMLURL,
-		PullRequestURL: ghp.PullRequestURL,
-		State:          ghp.State,
+		CommitID:       *ghp.CommitID,
+		HTMLURL:        *ghp.HTMLURL,
+		PullRequestURL: *ghp.PullRequestURL,
+		State:          state,
 	}
 }
