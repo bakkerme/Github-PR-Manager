@@ -1,16 +1,21 @@
-<script>
-  import { repoURLToName, repoNameToDisplay } from './functions';
-  import Avatar from './Avatar.svelte';
-  import CommentIcon from './assets/comment.svelte';
-  export let review = {};
-</script>
 <style>
   #review {
     background-color: var(--bg-light);
     padding: 10px 14px;
     margin-bottom: 8px;
 
-    font-size: 21px;
+  }
+
+  .approved {
+    border-left: 5px solid var(--approved);
+  }
+
+  .pending {
+    border-left: 5px solid var(--pending);
+  }
+
+  .changes_requested {
+    border-left: 5px solid var(--changes-requested);
   }
 
   h5, p {
@@ -20,6 +25,7 @@
 
   #title {
     margin-bottom: 8px;
+    font-size: 21px;
   }
 
   #repo {
@@ -32,6 +38,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+    margin-bottom: 7px;
   }
 
   #reviewUsers {
@@ -43,8 +50,49 @@
     flex-direction: row;
     align-items: center;
   }
+
+  #commentContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  #commentIcon {
+    width: 20px;
+    height: 20px;
+  }
+
+  #commentCount {
+    margin-left: 9px;
+    font-size: 21px;
+    margin-right: 8px;
+    padding-right: 8px;
+    border-right: 2px solid var(--fg-dark);
+  }
+
+  #commentText {
+    font-size: 16px;
+  }
 </style>
-<div id="review">
+
+<script>
+  import {
+      repoURLToName,
+      repoNameToDisplay,
+      getMostRecentInteractionToDisplay,
+      getFinalReviewState,
+      reviewStateToClass
+    } from './functions';
+  import Avatar from './Avatar.svelte';
+  import CommentIcon from './assets/comment.svelte';
+
+  export let review = {};
+
+  let reviewClass = reviewStateToClass(getFinalReviewState(review.ReviewStateForUser));
+  console.log(reviewClass);
+</script>
+
+<div id="review" class={reviewClass}>
   <h5 id="title">
     {review.Title}
   </h5>
@@ -68,6 +116,13 @@
       {/each}
     </div>
   </div>
-  <CommentIcon />
+  <div id="commentContainer">
+    <CommentIcon id="commentIcon" />
+    <p id="commentCount">
+      {review.CommentCount}
+    </p>
+    <p id="commentText">
+      {getMostRecentInteractionToDisplay(review)}
+  </div>
 </div>
 

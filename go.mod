@@ -1,6 +1,6 @@
 module github.com/bakkerme/github-pr-manager
 
-go 1.17
+go 1.19
 
 require (
 	github.com/bakkerme/hyperfocus-utils v1.1.0

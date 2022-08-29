@@ -12,8 +12,9 @@ import (
 type GithubService interface {
 	GetAssignedReviews(username string) ([]Issue, error)
 	GetCompletedReviews(username string) ([]Issue, error)
-	GetPullRequest(owner, repo string, number int) (*PullRequest, error)
+	GetPullRequest(owner, repo string, number int) (PullRequest, error)
 	GetPullRequestReviews(owner, repo string, number int) ([]PullRequestReview, error)
+	GetPullRequestComments(owner, repo string, number int) ([]PullRequestComment, error)
 }
 
 type githubService struct {
@@ -38,7 +39,11 @@ func (gh *githubService) GetAssignedReviews(username string) ([]Issue, error) {
 
 	issues := []Issue{}
 	for _, issue := range result.Issues {
-		issues = append(issues, *githubIssueToIssue(issue))
+		stIssue, err := githubIssueToIssue(issue)
+		if err != nil {
+			return nil, err
+		}
+		issues = append(issues, stIssue)
 	}
 
 	return issues, err
@@ -53,16 +58,24 @@ func (gh *githubService) GetCompletedReviews(username string) ([]Issue, error) {
 
 	issues := []Issue{}
 	for _, issue := range result.Issues {
-		issues = append(issues, *githubIssueToIssue(issue))
+		stIssue, err := githubIssueToIssue(issue)
+		if err != nil {
+			return nil, err
+		}
+		issues = append(issues, stIssue)
 	}
 
 	return issues, err
 }
 
-func (gh *githubService) GetPullRequest(owner, repo string, number int) (*PullRequest, error) {
+func (gh *githubService) GetPullRequest(owner, repo string, number int) (PullRequest, error) {
 	result, _, err := gh.client.PullRequests.Get(gh.ctx, owner, repo, number)
-	pr := githubPullRequestToPullRequest(result)
-	return &pr, err
+	if err != nil {
+		return PullRequest{}, err
+	}
+
+	pr, err := githubPullRequestToPullRequest(result)
+	return pr, err
 }
 
 func (gh *githubService) GetPullRequestReviews(owner, repo string, number int) ([]PullRequestReview, error) {
@@ -76,8 +89,33 @@ func (gh *githubService) GetPullRequestReviews(owner, repo string, number int) (
 
 	reviews := []PullRequestReview{}
 	for _, review := range result {
-		reviews = append(reviews, *githubPullRequestReviewToPullRequestReview(review))
+		prr, err := githubPullRequestReviewToPullRequestReview(review)
+		if err != nil {
+			return nil, err
+		}
+		reviews = append(reviews, prr)
 	}
 
 	return reviews, err
+}
+
+func (gh *githubService) GetPullRequestComments(owner, repo string, number int) ([]PullRequestComment, error) {
+	result, _, err := gh.client.PullRequests.ListComments(
+		gh.ctx,
+		owner,
+		repo,
+		number,
+		nil,
+	)
+
+	comments := []PullRequestComment{}
+	for _, comment := range result {
+		prc, err := githubPullRequestCommentToPullRequestComment(comment)
+		if err != nil {
+			return nil, err
+		}
+		comments = append(comments, prc)
+	}
+
+	return comments, err
 }

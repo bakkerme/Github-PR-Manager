@@ -1,2 +1,3 @@
 .envrc.local
 frontend/node_modules/
+frontend/dist/

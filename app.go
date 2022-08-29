@@ -63,8 +63,14 @@ func (a *App) GetPullRequestsToReviewForUser() ([]githubservice.PullRequest, err
 		reviewState := getReviewStateForUsers(reviews)
 		pr.ReviewStateForUser = reviewState
 
-		pullRequests[i] = *pr
+		comments, err := a.gh.GetPullRequestComments(userRepo.user, userRepo.repo, *issue.Number)
+		if err != nil {
+			return nil, err
+		}
+		pr.Comments = comments
 
+		// Add pr to list to return
+		pullRequests[i] = *pr
 	}
 
 	return pullRequests, nil
@@ -97,7 +103,7 @@ func (a *App) GetPullRequest(owner, repo string, number int) (*githubservice.Pul
 		return nil, err
 	}
 
-	return pr, nil
+	return &pr, nil
 }
 
 type userAndRepo struct {
@@ -122,10 +128,10 @@ func getReviewStateForUsers(reviews []githubservice.PullRequestReview) []githubs
 	userToReview := map[string]githubservice.UserReviewState{}
 
 	for _, review := range reviews {
-		if reviewEntry, ok := userToReview[review.User.Login]; ok {
+		if reviewEntry, ok := userToReview[*review.User.Login]; ok {
 			reviewEntry.ReviewState = review.State
 		} else {
-			userToReview[review.User.Login] = githubservice.UserReviewState{
+			userToReview[*review.User.Login] = githubservice.UserReviewState{
 				User:        review.User,
 				ReviewState: review.State,
 			}

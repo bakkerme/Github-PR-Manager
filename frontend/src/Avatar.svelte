@@ -1,26 +1,11 @@
 <script>
+  import { reviewStateToClass } from './functions';
   export let avatarURL = "";
   export let userName = "";
   export let reviewStatus = undefined;
   export let small = false;
 
-  let parsedReviewStatus;
-  switch(reviewStatus) {
-      case "APPROVED":
-          parsedReviewStatus = "approved";
-          break;
-      case "PENDING":
-          parsedReviewStatus = "pending";
-          break;
-      case "CHANGES_REQUESTED":
-          parsedReviewStatus = "changes_requested";
-          break;
-      case undefined:
-          parsedReviewStatus = "";
-          break;
-      default:
-          parsedReviewStatus = "pending";
-  }
+  let parsedReviewStatus = reviewStateToClass(reviewStatus);
 </script>
 
 <style>
