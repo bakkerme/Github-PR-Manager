@@ -25,11 +25,11 @@
 
   #title {
     margin-bottom: 8px;
-    font-size: 21px;
+    font-size: 0.9em;
   }
 
   #repo {
-    font-size: 15px;
+    font-size: 0.7em;
     color: var(--fg-dark);
     margin-bottom: 10px;
   }
@@ -64,14 +64,14 @@
 
   #commentCount {
     margin-left: 9px;
-    font-size: 21px;
+    font-size: 1em;
     margin-right: 8px;
     padding-right: 8px;
     border-right: 2px solid var(--fg-dark);
   }
 
   #commentText {
-    font-size: 16px;
+    font-size: 0.8em;
   }
 </style>
 
@@ -107,12 +107,10 @@
     />
     <div id="reviewUsers">
       {#each review.ReviewStateForUser as reviewer}
-        {#if reviewer.User.Login !== review.User.Login}
-          <Avatar
-            avatarURL={reviewer.User.AvatarURL}
-            reviewStatus={reviewer.ReviewState}
-          />
-        {/if}
+        <Avatar
+          avatarURL={reviewer.User.AvatarURL}
+          reviewStatus={reviewer.ReviewState}
+        />
       {/each}
     </div>
   </div>

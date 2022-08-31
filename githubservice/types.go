@@ -26,6 +26,21 @@ type Issue struct {
 	RepositoryURL     *string
 }
 
+// IssueComment is a struct that represents a comment on an issue
+type IssueComment struct {
+	ID     *int64
+	NodeID *string
+	Body   *string
+	User   *User
+	// Reactions         *Reactions
+	CreatedAt         *time.Time
+	UpdatedAt         *time.Time
+	AuthorAssociation *string
+	URL               *string
+	HTMLURL           *string
+	IssueURL          *string
+}
+
 // User is a struct that represents a user
 type User struct {
 	Login             *string
@@ -66,7 +81,8 @@ type PullRequest struct {
 	MergeableState     *string
 	MergedBy           *User
 	CommentCount       *int
-	Comments           []PullRequestComment
+	ReviewComments     []PullRequestComment
+	Comments           []IssueComment
 	Additions          *int
 	Deletions          *int
 	ChangedFiles       *int

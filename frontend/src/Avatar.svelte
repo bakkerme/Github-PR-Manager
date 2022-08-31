@@ -10,7 +10,7 @@
 
 <style>
   #user {
-    font-size: 16px;
+    font-size: 0.8em;
     display: flex;
     flex-direction: row;
   }

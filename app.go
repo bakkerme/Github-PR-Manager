@@ -4,6 +4,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/bakkerme/github-pr-manager/githubservice"
@@ -41,38 +42,10 @@ func (a *App) GetPullRequestsToReviewForUser() ([]githubservice.PullRequest, err
 		return nil, err
 	}
 
-	pullRequests := make([]githubservice.PullRequest, len(issues))
-	for i, issue := range issues {
-		userRepo, err := getUserAndRepoFromRepoURL(*issue.RepositoryURL)
-		if err != nil {
-			return nil, err
-		}
-
-		pr, err := a.GetPullRequest(userRepo.user, userRepo.repo, *issue.Number)
-		if err != nil {
-			return nil, err
-		}
-
-		reviews, err := a.gh.GetPullRequestReviews(userRepo.user, userRepo.repo, *issue.Number)
-		if err != nil {
-			return nil, err
-		}
-
-		pr.Reviews = reviews
-
-		reviewState := getReviewStateForUsers(reviews)
-		pr.ReviewStateForUser = reviewState
-
-		comments, err := a.gh.GetPullRequestComments(userRepo.user, userRepo.repo, *issue.Number)
-		if err != nil {
-			return nil, err
-		}
-		pr.Comments = comments
-
-		// Add pr to list to return
-		pullRequests[i] = *pr
+	pullRequests, err := processPullRequests(a.gh, issues)
+	if err != nil {
+		return []githubservice.PullRequest{}, err
 	}
-
 	return pullRequests, nil
 }
 
@@ -144,4 +117,73 @@ func getReviewStateForUsers(reviews []githubservice.PullRequestReview) []githubs
 	}
 
 	return reviewsForUser
+}
+
+func processPullRequests(gh githubservice.GithubService, issues []githubservice.Issue) ([]githubservice.PullRequest, error) {
+	type prAndError struct {
+		pr  *githubservice.PullRequest
+		err error
+	}
+
+	var ch = make(chan prAndError)
+
+	pullRequests := make([]githubservice.PullRequest, len(issues))
+	for _, issue := range issues {
+		go func(ch chan (prAndError), issue githubservice.Issue) {
+			issueNo := *issue.Number
+
+			userRepo, err := getUserAndRepoFromRepoURL(*issue.RepositoryURL)
+			if err != nil {
+				ch <- prAndError{err: err}
+				return
+			}
+
+			pr, err := gh.GetPullRequest(userRepo.user, userRepo.repo, issueNo)
+			if err != nil {
+				ch <- prAndError{err: err}
+				return
+			}
+
+			reviews, err := gh.GetPullRequestReviews(userRepo.user, userRepo.repo, issueNo)
+			if err != nil {
+				ch <- prAndError{err: err}
+				return
+			}
+
+			pr.Reviews = reviews
+			reviewState := getReviewStateForUsers(reviews)
+			pr.ReviewStateForUser = reviewState
+
+			comments, err := gh.GetIssueComments(userRepo.user, userRepo.repo, issueNo)
+			if err != nil {
+				ch <- prAndError{err: err}
+				return
+			}
+			pr.Comments = comments
+
+			ch <- prAndError{
+				pr: &pr,
+			}
+		}(ch, issue)
+	}
+
+	for i := 0; i < len(issues); i++ {
+		pr := <-ch
+		if pr.err != nil {
+			return nil, pr.err
+		}
+
+		pullRequests[i] = *pr.pr
+	}
+
+	sort.Slice(
+		pullRequests,
+		func(p, q int) bool {
+			// check if createdAt is less than the other
+			return pullRequests[p].CreatedAt.Before(*pullRequests[q].CreatedAt)
+		},
+	)
+
+	return pullRequests, nil
+
 }

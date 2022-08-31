@@ -27,29 +27,6 @@
 
       reviews = data;
   });
-
-  /* getCompletedReviews().then(async rawReviews => { */
-      /* if(rawReviews.length == 0) { */
-          /* return; */
-      /* }  */
-
-      /* reviews = rawReviews; */
-      /* console.log(rawReviews); */
-
-
-      /* [> console.log(pr); <] */
-
-      /* const reviewPRPromises = rawReviews.map(async review => { */
-          /* const {user, repo} = repoURLToName(review.RepositoryURL); */
-          /* const pr = await getPullRequest(user, repo, review.Number); */
-          /* return pr; */
-      /* }); */
-
-      /* const reviewPRs = await Promise.all(reviewPRPromises); */
-      /* console.log(reviewPRs); */
-    /* }).catch(e => {throw e}); */
-
-  /* console.log(reviews); */
 </script>
 <main>
   {#each reviews as review}

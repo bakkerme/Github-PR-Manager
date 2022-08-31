@@ -221,3 +221,27 @@ func githubPullRequestCommentToPullRequestComment(ghp *github.PullRequestComment
 		//: ghp.Reactions           //,
 	}, nil
 }
+
+func githubIssueCommentToIssueComment(ghp *github.IssueComment) (IssueComment, error) {
+	if ghp == nil {
+		return IssueComment{}, errors.New("github pull request comment is nil")
+	}
+
+	user, err := githubUserToUser(ghp.User)
+	if err != nil {
+		return IssueComment{}, err
+	}
+
+	return IssueComment{
+		ID:                ghp.ID,
+		NodeID:            ghp.NodeID,
+		Body:              ghp.Body,
+		User:              &user,
+		CreatedAt:         ghp.CreatedAt,
+		UpdatedAt:         ghp.UpdatedAt,
+		AuthorAssociation: ghp.AuthorAssociation,
+		URL:               ghp.URL,
+		HTMLURL:           ghp.HTMLURL,
+		IssueURL:          ghp.IssueURL,
+	}, nil
+}

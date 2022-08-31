@@ -15,6 +15,7 @@ type GithubService interface {
 	GetPullRequest(owner, repo string, number int) (PullRequest, error)
 	GetPullRequestReviews(owner, repo string, number int) ([]PullRequestReview, error)
 	GetPullRequestComments(owner, repo string, number int) ([]PullRequestComment, error)
+	GetIssueComments(owner, repo string, number int) ([]IssueComment, error)
 }
 
 type githubService struct {
@@ -34,7 +35,7 @@ func (gh *githubService) GetAssignedReviews(username string) ([]Issue, error) {
 	result, _, err := gh.client.Search.Issues(
 		gh.ctx,
 		fmt.Sprintf("is:open is:pr review-requested:%s", username),
-		&github.SearchOptions{Sort: "created", Order: "asc", ListOptions: github.ListOptions{PerPage: 100}},
+		&github.SearchOptions{Sort: "created", Order: "desc", ListOptions: github.ListOptions{PerPage: 100}},
 	)
 
 	issues := []Issue{}
@@ -53,7 +54,7 @@ func (gh *githubService) GetCompletedReviews(username string) ([]Issue, error) {
 	result, _, err := gh.client.Search.Issues(
 		gh.ctx,
 		fmt.Sprintf("is:pr reviewed-by:%s", username),
-		&github.SearchOptions{Sort: "created", Order: "asc", ListOptions: github.ListOptions{PerPage: 100}},
+		&github.SearchOptions{Sort: "created", Order: "desc", ListOptions: github.ListOptions{PerPage: 100}},
 	)
 
 	issues := []Issue{}
@@ -115,6 +116,27 @@ func (gh *githubService) GetPullRequestComments(owner, repo string, number int) 
 			return nil, err
 		}
 		comments = append(comments, prc)
+	}
+
+	return comments, err
+}
+
+func (gh *githubService) GetIssueComments(owner, repo string, number int) ([]IssueComment, error) {
+	result, _, err := gh.client.Issues.ListComments(
+		gh.ctx,
+		owner,
+		repo,
+		number,
+		nil,
+	)
+
+	comments := []IssueComment{}
+	for _, comment := range result {
+		ic, err := githubIssueCommentToIssueComment(comment)
+		if err != nil {
+			return nil, err
+		}
+		comments = append(comments, ic)
 	}
 
 	return comments, err
