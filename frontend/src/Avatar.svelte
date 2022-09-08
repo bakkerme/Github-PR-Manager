@@ -1,13 +1,3 @@
-<script>
-  import { reviewStateToClass } from './functions';
-  export let avatarURL = "";
-  export let userName = "";
-  export let reviewStatus = undefined;
-  export let small = false;
-
-  let parsedReviewStatus = reviewStateToClass(reviewStatus);
-</script>
-
 <style>
   #user {
     font-size: 0.8em;
@@ -52,7 +42,15 @@
     border-color: var(--changes-requested);
   }
 </style>
+<script>
+  import { reviewStateToClass } from './functions';
+  export let avatarURL = "";
+  export let userName = "";
+  export let reviewStatus = undefined;
+  export let small = false;
 
+  let parsedReviewStatus = reviewStateToClass(reviewStatus);
+</script>
 <div id="user" class={small ? "small" : ""}>
   <img src={avatarURL} class={parsedReviewStatus} />
   <p>

@@ -35,9 +35,23 @@ func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 }
 
-// GetPullRequestsToReviewForUser returns the pull requests to review for the given user
-func (a *App) GetPullRequestsToReviewForUser() ([]githubservice.PullRequest, error) {
+// GetAssignedPullRequestsForUser returns the pull requests to review for the given user
+func (a *App) GetAssignedPullRequestsForUser() ([]githubservice.PullRequest, error) {
 	issues, err := a.GetAssignedReviews()
+	if err != nil {
+		return nil, err
+	}
+
+	pullRequests, err := processPullRequests(a.gh, issues)
+	if err != nil {
+		return []githubservice.PullRequest{}, err
+	}
+	return pullRequests, nil
+}
+
+// GetReviewedPullRequestsForUser returns the pull requests to review for the given user
+func (a *App) GetReviewedPullRequestsForUser() ([]githubservice.PullRequest, error) {
+	issues, err := a.GetCompletedReviews()
 	if err != nil {
 		return nil, err
 	}
