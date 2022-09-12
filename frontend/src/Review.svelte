@@ -3,7 +3,7 @@
     background-color: var(--bg-light);
     padding: 10px 14px;
     margin-bottom: 8px;
-
+    cursor: pointer;
   }
 
   .approved {
@@ -51,6 +51,13 @@
     align-items: center;
   }
 
+  #bottomBarContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
   #commentContainer {
     display: flex;
     flex-direction: row;
@@ -73,26 +80,48 @@
   #commentText {
     font-size: 0.8em;
   }
+
+  #created {
+    font-size: 0.6em;
+    color: var(--fg-dark);
+  }
 </style>
 
 <script>
+  import { blur } from 'svelte/transition';
   import {
       repoURLToName,
       repoNameToDisplay,
       getMostRecentInteractionToDisplay,
       getFinalReviewState,
-      reviewStateToClass
+      reviewStateToClass,
+      dateToDisplay,
     } from './functions';
+  import {
+      BrowserOpenURL
+    } from '../wailsjs/runtime';
   import Avatar from './Avatar.svelte';
   import CommentIcon from './assets/comment.svelte';
 
   export let review = {};
 
-  let reviewClass = reviewStateToClass(getFinalReviewState(review.ReviewStateForUser));
-  console.log(reviewClass);
+  const onClick = () => {
+      BrowserOpenURL(review.HTMLURL);
+  }
+
+  $: reviewClass = reviewStateToClass(getFinalReviewState(review.ReviewStateForUser));
+
+  const date = new Date(review.CreatedAt);
+  $: createTime = dateToDisplay(date);
+
 </script>
 
-<div id="review" class={reviewClass}>
+<div
+    id="review"
+    class={reviewClass}
+    on:click={onClick}
+    transition:blur="{{delay: 250, duration: 300}}"
+>
   <h5 id="title">
     {review.Title}
   </h5>
@@ -114,13 +143,19 @@
       {/each}
     </div>
   </div>
-  <div id="commentContainer">
-    <CommentIcon id="commentIcon" />
-    <p id="commentCount">
-      {review.CommentCount}
-    </p>
-    <p id="commentText">
-      {getMostRecentInteractionToDisplay(review)}
+  <div id="bottomBarContainer">
+    <div id="commentContainer">
+      <CommentIcon id="commentIcon" />
+      <p id="commentCount">
+        {review.CommentCount}
+      </p>
+      <p id="commentText">
+        {getMostRecentInteractionToDisplay(review)}
+      </p>
+    </div>
+    <div id="created">
+      {createTime}
+    </div>
   </div>
 </div>
 

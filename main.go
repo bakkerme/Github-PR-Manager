@@ -46,10 +46,11 @@ func main() {
 	err := wails.Run(&options.App{
 		Title:            "github-pr-manager",
 		Width:            1024,
-		Height:           768,
+		Height:           1200,
 		Assets:           assets,
-		BackgroundColour: &options.RGBA{R: 27, G: 38, B: 54, A: 1},
+		BackgroundColour: &options.RGBA{R: 27, G: 38, B: 54, A: 255},
 		OnStartup:        app.startup,
+		// Frameless:        true,
 		Bind: []interface{}{
 			app,
 		},

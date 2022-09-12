@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/bakkerme/github-pr-manager/githubservice"
 )
@@ -42,7 +43,7 @@ func (a *App) GetAssignedPullRequestsForUser() ([]githubservice.PullRequest, err
 		return nil, err
 	}
 
-	pullRequests, err := processPullRequests(a.gh, issues)
+	pullRequests, err := processPullRequests(a.gh, issues, sortKeyUpdated, orderDirectionDesc)
 	if err != nil {
 		return []githubservice.PullRequest{}, err
 	}
@@ -56,7 +57,7 @@ func (a *App) GetReviewedPullRequestsForUser() ([]githubservice.PullRequest, err
 		return nil, err
 	}
 
-	pullRequests, err := processPullRequests(a.gh, issues)
+	pullRequests, err := processPullRequests(a.gh, issues, sortKeyUpdated, orderDirectionDesc)
 	if err != nil {
 		return []githubservice.PullRequest{}, err
 	}
@@ -133,7 +134,17 @@ func getReviewStateForUsers(reviews []githubservice.PullRequestReview) []githubs
 	return reviewsForUser
 }
 
-func processPullRequests(gh githubservice.GithubService, issues []githubservice.Issue) ([]githubservice.PullRequest, error) {
+type orderDirection string
+type sortKey string
+
+const (
+	orderDirectionAsc  orderDirection = "asc"
+	orderDirectionDesc orderDirection = "desc"
+	sortKeyUpdated     sortKey        = "updated"
+	sortKeyCreated     sortKey        = "created"
+)
+
+func processPullRequests(gh githubservice.GithubService, issues []githubservice.Issue, sortfield sortKey, order orderDirection) ([]githubservice.PullRequest, error) {
 	type prAndError struct {
 		pr  *githubservice.PullRequest
 		err error
@@ -193,8 +204,31 @@ func processPullRequests(gh githubservice.GithubService, issues []githubservice.
 	sort.Slice(
 		pullRequests,
 		func(p, q int) bool {
-			// check if createdAt is less than the other
-			return pullRequests[p].CreatedAt.Before(*pullRequests[q].CreatedAt)
+			currPR := pullRequests[p]
+			otherPR := pullRequests[q]
+
+			var fieldToCompare *time.Time
+			var otherFieldToCompare *time.Time
+			switch sortfield {
+			case sortKeyUpdated:
+				fieldToCompare = currPR.UpdatedAt
+				otherFieldToCompare = otherPR.UpdatedAt
+				break
+			case sortKeyCreated:
+				fieldToCompare = currPR.CreatedAt
+				otherFieldToCompare = otherPR.CreatedAt
+				break
+			}
+
+			if fieldToCompare == nil || otherFieldToCompare == nil {
+				return false
+			}
+
+			if order == orderDirectionAsc {
+				return fieldToCompare.Before(*otherFieldToCompare)
+			}
+
+			return fieldToCompare.After(*otherFieldToCompare)
 		},
 	)
 

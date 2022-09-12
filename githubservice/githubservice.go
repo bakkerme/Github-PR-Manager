@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/google/go-github/v45/github"
 )
 
@@ -38,13 +39,13 @@ func (gh *githubService) GetAssignedReviews(username string) ([]Issue, error) {
 		&github.SearchOptions{Sort: "created", Order: "desc", ListOptions: github.ListOptions{PerPage: 100}},
 	)
 
-	issues := []Issue{}
-	for _, issue := range result.Issues {
+	issues := make([]Issue, len(result.Issues))
+	for i, issue := range result.Issues {
 		stIssue, err := githubIssueToIssue(issue)
 		if err != nil {
 			return nil, err
 		}
-		issues = append(issues, stIssue)
+		issues[i] = stIssue
 	}
 
 	return issues, err
@@ -54,17 +55,20 @@ func (gh *githubService) GetCompletedReviews(username string) ([]Issue, error) {
 	result, _, err := gh.client.Search.Issues(
 		gh.ctx,
 		fmt.Sprintf("is:pr reviewed-by:%s", username),
-		&github.SearchOptions{Sort: "created", Order: "desc", ListOptions: github.ListOptions{PerPage: 100}},
+		nil,
+		// &github.SearchOptions{Sort: "updated", Order: "asc", ListOptions: github.ListOptions{PerPage: 100}},
 	)
 
-	issues := []Issue{}
-	for _, issue := range result.Issues {
+	issues := make([]Issue, len(result.Issues))
+	for i, issue := range result.Issues {
 		stIssue, err := githubIssueToIssue(issue)
 		if err != nil {
 			return nil, err
 		}
-		issues = append(issues, stIssue)
+		issues[i] = stIssue
 	}
+
+	spew.Dump(issues)
 
 	return issues, err
 }
