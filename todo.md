@@ -1,12 +1,12 @@
 * Bugs
   * All assigned users aren't in the list
   * Comments should be both global comments and comments on code
-  * PR status marker not working
 * Org filter
 * Auto update
 * Hide PR
 * PAT storage
 * Package
+* Should assigned contain reviewd but not merged?
 
 DONE
 * Basic GUI
