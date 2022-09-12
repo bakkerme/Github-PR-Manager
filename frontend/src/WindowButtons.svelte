@@ -56,7 +56,7 @@
       <Maximise />
     {/if}
   </div>
-  <div class="windowButton" id="windowButtonClose" on:click={onRestore}>
+  <div class="windowButton" id="windowButtonClose" on:click={onClose}>
     <Close class="icon" />
   </div>
 </div>

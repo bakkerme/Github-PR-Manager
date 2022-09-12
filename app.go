@@ -152,7 +152,7 @@ func processPullRequests(gh githubservice.GithubService, issues []githubservice.
 
 	var ch = make(chan prAndError)
 
-	pullRequests := make([]githubservice.PullRequest, len(issues))
+	pullRequests := []githubservice.PullRequest{}
 	for _, issue := range issues {
 		go func(ch chan (prAndError), issue githubservice.Issue) {
 			issueNo := *issue.Number
@@ -162,6 +162,14 @@ func processPullRequests(gh githubservice.GithubService, issues []githubservice.
 				ch <- prAndError{err: err}
 				return
 			}
+
+			if userRepo.user != "ArkoseLabs" {
+				ch <- prAndError{
+					pr: nil,
+				}
+				return
+			}
+			println(userRepo.user)
 
 			pr, err := gh.GetPullRequest(userRepo.user, userRepo.repo, issueNo)
 			if err != nil {
@@ -198,7 +206,9 @@ func processPullRequests(gh githubservice.GithubService, issues []githubservice.
 			return nil, pr.err
 		}
 
-		pullRequests[i] = *pr.pr
+		if pr.pr != nil {
+			pullRequests = append(pullRequests, *pr.pr)
+		}
 	}
 
 	sort.Slice(
