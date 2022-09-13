@@ -1,5 +1,9 @@
 <script>
-  import { WindowToggleMaximise, WindowMinimise, Quit, WindowGetPosition } from '../wailsjs/runtime';
+  import {
+      WindowToggleMaximise,
+      WindowMinimise,
+      Quit,
+    } from '../wailsjs/runtime';
 
   import {
       repoURLToName,
@@ -8,18 +12,25 @@
       REVIEWED,
       CREATED,
     } from './functions';
+
+  import { IsFrameless } from '../wailsjs/go/main/App';
   import Review from './Review.svelte';
   import Tab from './Tab.svelte';
   import TabContainer from './TabContainer.svelte';
+  import RefreshIcon from './assets/refresh.svelte';
   import WindowButtons from './WindowButtons.svelte';
-  import testdata from './testdata.json';
 
   let activeTab = 'assigned';
+  let framelessPromise = IsFrameless();
 
   $: reviewsPromise = getReviews(activeTab);
 
   const setActiveTab = (tab) => async () => {
       activeTab = tab;
+  }
+
+  const refresh = () => {
+      reviewsPromise = getReviews(activeTab);
   }
 </script>
 <main>
@@ -28,12 +39,18 @@
     <Tab active={activeTab === CREATED} onClick={setActiveTab(CREATED)}>Created</Tab>
     <Tab></Tab>
     <Tab active={activeTab === REVIEWED} onClick={setActiveTab(REVIEWED)}>Reviewed</Tab>
-    <WindowButtons
-        onMaximise={WindowToggleMaximise}
-        onRestore={WindowToggleMaximise}
-        onMinimise={WindowMinimise}
-        onClose={Quit}
-      />
+
+    {#await framelessPromise}
+    {:then frameless}
+      {#if frameless}
+        <WindowButtons
+          onMaximise={WindowToggleMaximise}
+          onRestore={WindowToggleMaximise}
+          onMinimise={WindowMinimise}
+          onClose={Quit}
+        />
+      {/if}
+    {/await}
   </TabContainer>
   {#await reviewsPromise}
     <p>loading...</p>

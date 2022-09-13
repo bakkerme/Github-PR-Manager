@@ -21,3 +21,7 @@ export function GetPullRequest(arg1, arg2, arg3) {
 export function GetReviewedPullRequestsForUser() {
   return window['go']['main']['App']['GetReviewedPullRequestsForUser']();
 }
+
+export function IsFrameless() {
+  return window['go']['main']['App']['IsFrameless']();
+}

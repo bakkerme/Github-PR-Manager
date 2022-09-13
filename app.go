@@ -13,6 +13,7 @@ import (
 
 type config struct {
 	GithubUsername string
+	Frameless      bool
 }
 
 // App struct
@@ -92,6 +93,11 @@ func (a *App) GetPullRequest(owner, repo string, number int) (*githubservice.Pul
 	}
 
 	return &pr, nil
+}
+
+// IsFrameless returns if frameless window is turned on
+func (a *App) IsFrameless() bool {
+	return a.cfg.Frameless
 }
 
 type userAndRepo struct {

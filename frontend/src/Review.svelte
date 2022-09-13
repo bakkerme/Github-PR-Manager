@@ -97,9 +97,7 @@
       reviewStateToClass,
       dateToDisplay,
     } from './functions';
-  import {
-      BrowserOpenURL
-    } from '../wailsjs/runtime';
+  import { BrowserOpenURL } from '../wailsjs/runtime';
   import Avatar from './Avatar.svelte';
   import CommentIcon from './assets/comment.svelte';
 

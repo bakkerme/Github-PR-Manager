@@ -37,6 +37,7 @@ func main() {
 
 	cfg := config{
 		GithubUsername: username,
+		Frameless:      true,
 	}
 
 	// Create an instance of the app structure
@@ -50,7 +51,7 @@ func main() {
 		Assets:           assets,
 		BackgroundColour: &options.RGBA{R: 27, G: 38, B: 54, A: 255},
 		OnStartup:        app.startup,
-		// Frameless:        true,
+		Frameless:        cfg.Frameless,
 		Bind: []interface{}{
 			app,
 		},

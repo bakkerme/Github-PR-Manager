@@ -11,3 +11,5 @@ export function GetCompletedReviews():Promise<Array<githubservice.Issue>>;
 export function GetPullRequest(arg1:string,arg2:string,arg3:number):Promise<githubservice.PullRequest>;
 
 export function GetReviewedPullRequestsForUser():Promise<Array<githubservice.PullRequest>>;
+
+export function IsFrameless():Promise<boolean>;
