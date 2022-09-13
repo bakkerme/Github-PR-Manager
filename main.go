@@ -20,12 +20,18 @@ func main() {
 	ctx := context.Background()
 
 	envRead := hfutils.EnvRead{}
-	token, found := envRead.LookupEnv("GITHUB_ACCESS_TOKEN")
-	username, found := envRead.LookupEnv("GITHUB_USERNAME")
 
+	token, found := envRead.LookupEnv("GITHUB_ACCESS_TOKEN")
 	if !found {
 		panic("Could not load GITHUB_ACCESS_TOKEN from env")
 	}
+
+	username, found := envRead.LookupEnv("GITHUB_USERNAME")
+	if !found {
+		panic("Could not load GITHUB_USERNAME from env")
+	}
+
+	orgFilter, orgFilterFound := envRead.LookupEnv("ORG_FILTER")
 
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: token},
@@ -38,6 +44,10 @@ func main() {
 	cfg := config{
 		GithubUsername: username,
 		Frameless:      true,
+	}
+
+	if orgFilterFound {
+		cfg.OrgFilter = &orgFilter
 	}
 
 	// Create an instance of the app structure

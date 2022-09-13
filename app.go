@@ -14,6 +14,7 @@ import (
 type config struct {
 	GithubUsername string
 	Frameless      bool
+	OrgFilter      *string
 }
 
 // App struct
@@ -44,7 +45,7 @@ func (a *App) GetAssignedPullRequestsForUser() ([]githubservice.PullRequest, err
 		return nil, err
 	}
 
-	pullRequests, err := processPullRequests(a.gh, issues, sortKeyUpdated, orderDirectionDesc)
+	pullRequests, err := processPullRequests(a.gh, issues, sortKeyUpdated, orderDirectionDesc, a.cfg.OrgFilter)
 	if err != nil {
 		return []githubservice.PullRequest{}, err
 	}
@@ -58,7 +59,7 @@ func (a *App) GetReviewedPullRequestsForUser() ([]githubservice.PullRequest, err
 		return nil, err
 	}
 
-	pullRequests, err := processPullRequests(a.gh, issues, sortKeyUpdated, orderDirectionDesc)
+	pullRequests, err := processPullRequests(a.gh, issues, sortKeyUpdated, orderDirectionDesc, a.cfg.OrgFilter)
 	if err != nil {
 		return []githubservice.PullRequest{}, err
 	}
@@ -150,7 +151,13 @@ const (
 	sortKeyCreated     sortKey        = "created"
 )
 
-func processPullRequests(gh githubservice.GithubService, issues []githubservice.Issue, sortfield sortKey, order orderDirection) ([]githubservice.PullRequest, error) {
+func processPullRequests(
+	gh githubservice.GithubService,
+	issues []githubservice.Issue,
+	sortfield sortKey,
+	order orderDirection,
+	orgFilter *string,
+) ([]githubservice.PullRequest, error) {
 	type prAndError struct {
 		pr  *githubservice.PullRequest
 		err error
@@ -169,7 +176,7 @@ func processPullRequests(gh githubservice.GithubService, issues []githubservice.
 				return
 			}
 
-			if userRepo.user != "ArkoseLabs" {
+			if orgFilter != nil && userRepo.user != *orgFilter {
 				ch <- prAndError{
 					pr: nil,
 				}
