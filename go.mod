@@ -6,7 +6,7 @@ require (
 	github.com/bakkerme/hyperfocus-utils v1.1.0
 	github.com/davecgh/go-spew v1.1.1
 	github.com/google/go-github/v45 v45.2.0
-	github.com/wailsapp/wails/v2 v2.0.0-beta.44.2
+	github.com/wailsapp/wails/v2 v2.0.0-rc.1.1
 	golang.org/x/oauth2 v0.0.0-20220722155238-128564f6959c
 )
 
@@ -31,7 +31,7 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.1 // indirect
 	github.com/wailsapp/mimetype v1.4.1 // indirect
-	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5 // indirect
+	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
 	golang.org/x/net v0.0.0-20220624214902-1bab6f366d9e // indirect
 	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
 	golang.org/x/text v0.3.7 // indirect

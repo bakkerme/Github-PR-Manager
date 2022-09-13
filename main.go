@@ -43,7 +43,7 @@ func main() {
 
 	cfg := config{
 		GithubUsername: username,
-		Frameless:      true,
+		Frameless:      false,
 	}
 
 	if orgFilterFound {

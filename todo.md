@@ -1,14 +1,17 @@
 * Bugs
-  * All assigned users aren't in the list
   * Comments should be both global comments and comments on code
-* Org filter
+* Merged label (use the merge purple)
 * Auto update
 * Hide PR
+	* Tack it to the bottom of the list under a "hidden" expander thing
 * PAT storage
 * Package
-* Should assigned contain reviewd but not merged?
+* Active Tab, contains both reviewed but not merged, and to review
 
 DONE
+* Org filter
+* Should assigned contain reviewed but not merged?
+* All assigned users aren't in the list
 * Basic GUI
   * Wails v2 beta
   * Front end toolkit
