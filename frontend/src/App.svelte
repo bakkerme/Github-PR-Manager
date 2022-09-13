@@ -4,6 +4,7 @@
       WindowMinimise,
       Quit,
     } from '../wailsjs/runtime';
+  import { IsFrameless } from '../wailsjs/go/main/App';
 
   import {
       repoURLToName,
@@ -13,12 +14,11 @@
       CREATED,
     } from './functions';
 
-  import { IsFrameless } from '../wailsjs/go/main/App';
   import Review from './Review.svelte';
   import Tab from './Tab.svelte';
   import TabContainer from './TabContainer.svelte';
-  import RefreshIcon from './assets/refresh.svelte';
   import WindowButtons from './WindowButtons.svelte';
+  import RefreshButton from './RefreshButton.svelte';
 
   let activeTab = 'assigned';
   let framelessPromise = IsFrameless();
@@ -39,6 +39,8 @@
     <Tab active={activeTab === CREATED} onClick={setActiveTab(CREATED)}>Created</Tab>
     <Tab></Tab>
     <Tab active={activeTab === REVIEWED} onClick={setActiveTab(REVIEWED)}>Reviewed</Tab>
+
+    <RefreshButton onClick={refresh} />
 
     {#await framelessPromise}
     {:then frameless}

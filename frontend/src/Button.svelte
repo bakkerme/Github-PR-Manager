@@ -1,6 +1,12 @@
 <style>
   #container {
     background-color: var(--bg-light);
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 5px;
+
+    width: 20px;
+    height: 20px;
   }
 </style>
 <script>
