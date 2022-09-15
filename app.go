@@ -12,9 +12,10 @@ import (
 )
 
 type config struct {
-	GithubUsername string
-	Frameless      bool
-	OrgFilter      *string
+	GithubUsername    string
+	GithubAccessToken string
+	Frameless         bool
+	OrgFilter         *string
 }
 
 // App struct
@@ -182,7 +183,6 @@ func processPullRequests(
 				}
 				return
 			}
-			println(userRepo.user)
 
 			pr, err := gh.GetPullRequest(userRepo.user, userRepo.repo, issueNo)
 			if err != nil {

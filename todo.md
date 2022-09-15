@@ -1,3 +1,6 @@
+* Font doesn't look like it's being included properly
+  * at least in windows
+* Config file paths need to be absolute
 * Bugs
   * Comments should be both global comments and comments on code
 * Merged label (use the merge purple)

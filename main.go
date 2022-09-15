@@ -4,8 +4,9 @@ import (
 	"context"
 	"embed"
 
-	hfutils "github.com/bakkerme/hyperfocus-utils"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/google/go-github/v45/github"
+	"github.com/spf13/viper"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"golang.org/x/oauth2"
@@ -16,39 +17,64 @@ import (
 //go:embed frontend/dist
 var assets embed.FS
 
+func loadEnvConfig() {
+	viper.SetConfigFile(".env")
+	viper.ReadInConfig() // Find and read the config file
+
+	viper.SetConfigFile(".env.local")
+	viper.SetConfigType("env")
+	viper.MergeInConfig()
+}
+
+func loadFileConfig() {
+	viper.SetConfigFile("%USERPROFILE%\\AppData\\Local\\GithubPRManager\\config")
+	viper.SetConfigType("env")
+	viper.SetConfigFile("/home/brandon/.config/github-pr-manager/config")
+	viper.SetConfigType("env")
+	viper.ReadInConfig()
+}
+
+func loadConfig() config {
+	loadEnvConfig()
+	loadFileConfig()
+
+	var orgFilter *string
+	if viper.IsSet("ORG_FILTER") {
+		value := viper.GetString("ORG_FILTER")
+		if value != "" {
+			orgFilter = &value
+		}
+	}
+
+	if !viper.IsSet("GITHUB_USERNAME") || viper.GetString("GITHUB_USERNAME") == "" {
+		panic("GITHUB_USERNAME is not set")
+	}
+
+	if !viper.IsSet("GITHUB_ACCESS_TOKEN") || viper.GetString("GITHUB_ACCESS_TOKEN") == "" {
+		panic("GITHUB_ACCESS_TOKEN is not set")
+	}
+
+	return config{
+		GithubUsername:    viper.GetString("GITHUB_USERNAME"),
+		GithubAccessToken: viper.GetString("GITHUB_ACCESS_TOKEN"),
+		Frameless:         viper.GetBool("FRAMELESS"),
+		OrgFilter:         orgFilter,
+	}
+}
+
 func main() {
 	ctx := context.Background()
 
-	envRead := hfutils.EnvRead{}
-
-	token, found := envRead.LookupEnv("GITHUB_ACCESS_TOKEN")
-	if !found {
-		panic("Could not load GITHUB_ACCESS_TOKEN from env")
-	}
-
-	username, found := envRead.LookupEnv("GITHUB_USERNAME")
-	if !found {
-		panic("Could not load GITHUB_USERNAME from env")
-	}
-
-	orgFilter, orgFilterFound := envRead.LookupEnv("ORG_FILTER")
+	cfg := loadConfig()
+	spew.Dump(cfg)
 
 	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: token},
+		&oauth2.Token{AccessToken: cfg.GithubAccessToken},
 	)
 	tc := oauth2.NewClient(ctx, ts)
 	client := github.NewClient(tc)
 
 	gh := githubservice.New(ctx, client)
-
-	cfg := config{
-		GithubUsername: username,
-		Frameless:      false,
-	}
-
-	if orgFilterFound {
-		cfg.OrgFilter = &orgFilter
-	}
 
 	// Create an instance of the app structure
 	app := NewApp(gh, cfg)
