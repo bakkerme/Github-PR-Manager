@@ -1,15 +1,14 @@
-* Font doesn't look like it's being included properly
-  * at least in windows
 * Config file paths need to be absolute
-* Bugs
-  * Comments should be both global comments and comments on code
+* Mark draft PRs
 * Merged label (use the merge purple)
+* Active Tab, contains both reviewed but not merged, and to review
 * Auto update
+* Font doesn't look like it's being included properly on Windows
 * Hide PR
 	* Tack it to the bottom of the list under a "hidden" expander thing
 * PAT storage
 * Package
-* Active Tab, contains both reviewed but not merged, and to review
+* Comments should be both global comments and comments on code
 
 DONE
 * Org filter
